@@ -13,7 +13,13 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os, pwd
 
 USER = pwd.getpwuid(os.getuid()).pw_name
-MODE = 'server' if USER == 'ubuntu' else 'dev'
+MODE = 'server' if USER == 'ubuntu' or USER == 'www-data' else 'dev'
+
+if MODE == 'server':
+    USER_PATH = '/home/www-data/local/'
+else:
+    USER_PATH = '/home/{}/local/'.format(USER)
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,7 +68,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            'serv/template/'
+            '{}/serv/template/'.format(BASE_DIR),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -85,7 +91,7 @@ WSGI_APPLICATION = 'keyserv.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join('', '/home/{}/local/db.sqlite3'.format(USER)),
+        'NAME': os.path.join(USER_PATH, 'db.sqlite3'),
     }
 }
 
