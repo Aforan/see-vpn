@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os
+import os, pwd
+
+USER = pwd.getpwuid(os.getuid()).pw_name
+MODE = 'server' if USER == 'ubuntu' else 'dev'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,10 +85,9 @@ WSGI_APPLICATION = 'keyserv.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join('', '/home/cad/local/db.sqlite3'),
+        'NAME': os.path.join('', '/home/{}/local/db.sqlite3'.format(USER)),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
