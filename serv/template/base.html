@@ -1,0 +1,22 @@
+<html>
+    <head></head>
+    <body>
+        {% block nav %}
+        <ul id="nav">
+            <li><a href="/">Home</a></li>
+        {% if user.is_authenticated %}
+            {% if is_admin %}
+            <li><a href="/user_admin">User Administration</a></li>
+            <li><a href="/key_list">Keys</a></li>
+            {% endif %}
+
+            <li><a href="/logout">Logout</a></li>
+        {% else %}
+            <li><a href="/login">Login</a></li>
+        {% endif %}
+        </ul>
+        {% endblock %}
+
+        {% block content %}{% endblock %}
+    </body>
+</html>

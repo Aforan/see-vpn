@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% load serv_tags %}
+{% block content %}
+
+{{ message }}
+
+<table>
+	<thead>
+		<tr>
+			<th>Key Name</th>
+			<th>Assigned User</th>
+			<th>VPN Config Files</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for key in keys %}
+		<tr>
+			<td>{{ key.name }}</td>
+			<td>{{ key.userdetailsmodel.user.username }}</td>
+			<td>{{ key.name|download_link }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

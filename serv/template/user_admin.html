@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% load serv_tags %}
+{% block content %}
+
+{{ message }}
+
+<table>
+	<thead>
+		<tr>
+			<th>Username</th>
+			<th>Organization</th>
+			<th>Contact Name</th>
+			<th>Email</th>
+			<th>Phone</th>
+			<th>Key Name</th>
+			<th>Is Active</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+
+	<tbody>
+		{% for details in user_details %}
+		<tr>
+			<td>{{ details.details.user.username }}</td>
+			<td>{{ details.details.org_name }}</td>
+			<td>{{ details.details.contact_name }}</td>
+			<td>{{ details.details.contact_email }}</td>
+			<td>{{ details.details.contact_phone }}</td>
+			<td>{{ details.details.key.name }}</td>
+			<td>{{ details.details.user.is_active }}</td>
+			<td>
+				<form action="/user_admin/" method="post">
+					{% csrf_token %}
+					{{ details.form.cleaned_data.is_active }}
+					{{ details.form }}
+					{% if details.details.user.is_active %}
+					<input type="submit" value="Deactivate" />
+					{% else %}
+					<input type="submit" value="Activate" />
+					{% endif %}
+				</form>
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{% endblock %}

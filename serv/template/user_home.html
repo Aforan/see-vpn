@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% load serv_tags %}
+{% block content %}
+
+{{ message }}
+
+<div>
+	<h2>Download OpenVPN Config</h2>
+	{% if key %}
+	<div>{{ key.name|download_link }}</div>
+	{% else %}
+	<div>This account is inactive, contact the administrator for activation</div>
+	{% endif %}
+	<div>Fillmein</div>
+</div>
+
+{% endblock %}
