@@ -112,9 +112,9 @@ persist-tun
 # a separate .crt/.key file pair
 # for each client.  A single ca
 # file can be used for all clients.
-ca "Keys\\ca.crt"
-cert "Keys\\client.crt"
-key "Keys\\client.key"
+ca "Keys\\\\ca.crt"
+cert "Keys\\\\client.crt"
+key "Keys\\\\client.key"
 
 # Verify server certificate by checking
 # that the certicate has the nsCertType
