@@ -22,7 +22,7 @@ class UserRequestForm(forms.Form):
 	password = forms.CharField(label="Password", max_length=64, required=True,
 							   widget=forms.PasswordInput)
 
-	password_repeat = forms.CharField(label="Password", max_length=64, required=True,
+	password_repeat = forms.CharField(label="Password (Repeat)", max_length=64, required=True,
 									  widget=forms.PasswordInput)
 
 class ToggleActiveUserForm(forms.Form):

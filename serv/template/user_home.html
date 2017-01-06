@@ -8,11 +8,15 @@
 <div>
 	<h2>Download OpenVPN Config</h2>
 	{% if key %}
-	<div>{{ key.name|download_link }}</div>
+	<div><p>{{ key.name|download_link }}</p></div>
 	{% else %}
-	<div>This account is inactive, contact the administrator for activation</div>
+	<p>This account is inactive, contact the administrator for activation</p>
 	{% endif %}
-	<div>Fillmein</div>
+	<div>
+		<p>Download the VPN configuration files and instructions for use from the link above.</p>
+		<p>Please note that this is configured for use with Windows</p>
+		<p>If you have any issues using the VPN, please <a href="mailto:andrew.foran.vr@gmail.com">contact me</a></p>
+	</div>
 </div>
 
 {% endblock %}

@@ -4,9 +4,17 @@
 
 {{ message }}
 
-<form action="/user_request/" method="post">
+<form class="ui form" action="/user_request/" method="post">
     {% csrf_token %}
-    {{ form }}
+    {% for field in form %}
+	<div class="two fields">
+    	<div class="field">
+    		{{ field.errors }}
+    		{{ field.label_tag }}
+    		{{ field }}
+    	</div>
+    </div>
+    {% endfor %}
     <input type="submit" value="Submit" />
 </form>
 

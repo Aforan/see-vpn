@@ -1,22 +1,32 @@
 <html>
-    <head></head>
+    <head>
+        <script
+          src="https://code.jquery.com/jquery-3.1.1.min.js"
+          integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+          crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.css">
+    </head>
     <body>
         {% block nav %}
-        <ul id="nav">
-            <li><a href="/">Home</a></li>
-        {% if user.is_authenticated %}
-            {% if is_admin %}
-            <li><a href="/user_admin">User Administration</a></li>
-            <li><a href="/key_list">Keys</a></li>
+        <div class="ui container">
+            <div class="ui large secondary pointing menu">
+                <a class="item" href="/">Home</a>
+            {% if user.is_authenticated %}
+                {% if is_admin %}
+                <a class="item" href="/user_admin">User Administration</a>
+                <a class="item" href="/key_list">Keys</a>
+                {% endif %}
+
+                <a class="right item" href="/logout">Logout</a>
+            {% else %}
+                <a class="right item" href="/login">Login</a>
             {% endif %}
-
-            <li><a href="/logout">Logout</a></li>
-        {% else %}
-            <li><a href="/login">Login</a></li>
-        {% endif %}
-        </ul>
+            </div>
+        </div>
         {% endblock %}
-
+        <div class="ui container">
         {% block content %}{% endblock %}
+        </div>
     </body>
 </html>
