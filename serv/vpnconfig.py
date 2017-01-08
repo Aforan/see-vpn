@@ -6,7 +6,9 @@ Contact: andrew.foran.vr@gmail.com
 Contents:
 	-	README				This File
 	-	runvpn.bat			Bat to run the VPN client
+	-	vpninfo.bat			Bat to return the ip address of your vpn adapter
 	-	client.ovpn			OpenVPN Client configuration file, see Config
+
 	-	Keys
 		-	ca.crt			Certificate Authority Key
 		-	client.crt		Client certificate, Unique to YOU
@@ -16,6 +18,14 @@ Usage:
 -	Double click the "runvpn.bat" file
 -	A terminal window should open and dump logs for it's initialization
 -	You should see "Initialization Sequence Completed" when complete
+
+Notes:
+vpninfo.bat will not tell you if the vpn is running, it simply returns the last ip address
+			used by your openvpn network adapter.  Make sure the vpn is running by checking
+			the output of runvpn.bat.  Alternatively, you can locate the ip address of your
+			vpn client by running ipconfig and looking for it.  You can use 
+			$ openvpn --show-adapters to show which adapter is used by openvpn
+
 """
 
 _RUNVPNTEXT = """::Hacky hacks from here: http://stackoverflow.com/questions/11525056/how-to-create-a-batch-file-to-run-cmd-as-administrator
@@ -51,7 +61,24 @@ openvpn --config "client.ovpn"
 """
 
 
+_VPNINFOBAT = """::Attempt to extract the ip address of the adapter connected to the VPN
+::This will return the last ip address used to connect if the vpn is not connected
+::This script WILL NOT tell you if the vpn is connected or not, see the runvpn output for connection status
 
+@echo off
+for /f "delims=" %%i in ('openvpn --show-adapters') do set _test=%%i
+echo Adapter: %_test%
+SET _endbit=%_test:*' {=%
+CALL SET _result=%%_test:%_endbit%=%%
+SET _result=%_result:' {=%
+SET _result=%_result:'=%
+
+echo Extracted Adapter Name: %_result% 
+
+for /f "delims=" %%i in ('netsh interface ip show addresses "%_result%"') do echo %%i
+
+pause
+"""
 
 _CLIENTCONFIGTEXT = """
 ##############################################
@@ -191,6 +218,9 @@ def get_readme():
 def get_bat_file():
 	return _RUNVPNTEXT
 
+def get_vpninfo_file():
+	return _VPNINFOBAT
+
 def get_config_file(remote_address):
 	return _CLIENTCONFIGTEXT.format(remote_address=remote_address)
 
@@ -223,6 +253,9 @@ def get_config_zip(key):
 
 	bat_path = os.path.join(subdir, 'runvpn.bat')
 	zf.writestr(bat_path, get_bat_file().replace('\n', '\r\n'))
+
+	vpninfo_path = os.path.join(subdir, 'vpninfo.bat')
+	zf.writestr(bat_path, get_vpninfo_file().replace('\n', '\r\n'))
 
 	config_path = os.path.join(subdir, 'client.ovpn')
 	zf.writestr(config_path, get_config_file(settings.server_address).replace('\n', '\r\n'))
