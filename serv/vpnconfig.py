@@ -5,23 +5,53 @@ Contact: andrew.foran.vr@gmail.com
 
 Contents:
 	-	README				This File
-	-	runvpn.bat			Bat to run the VPN client, see Assumptions
+	-	runvpn.bat			Bat to run the VPN client
 	-	client.ovpn			OpenVPN Client configuration file, see Config
 	-	Keys
 		-	ca.crt			Certificate Authority Key
 		-	client.crt		Client certificate, Unique to YOU
 		-	client.key		Client key, This should be kept secret, don't give away
 
-Config:
+Usage: 
+-	Double click the "runvpn.bat" file
+-	A terminal window should open and dump logs for it's initialization
+-	You should see "Initialization Sequence Completed" when complete
+"""
 
+_RUNVPNTEXT = """::Hacky hacks from here: http://stackoverflow.com/questions/11525056/how-to-create-a-batch-file-to-run-cmd-as-administrator
 
-Assumptions:
+@echo off
+:: BatchGotAdmin
+::-------------------------------------
+REM  --> Check for permissions
+>nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system"
+
+REM --> If error flag set, we do not have admin.
+if '%errorlevel%' NEQ '0' (
+    echo Requesting administrative privileges...
+    goto UACPrompt
+) else ( goto gotAdmin )
+
+:UACPrompt
+    echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
+    set params = %*:"="
+    echo UAC.ShellExecute "cmd.exe", "/c %~s0 %params%", "", "runas", 1 >> "%temp%\getadmin.vbs"
+
+    "%temp%\getadmin.vbs"
+    del "%temp%\getadmin.vbs"
+    exit /B
+
+:gotAdmin
+    pushd "%CD%"
+    CD /D "%~dp0"
+::--------------------------------------
+
+openvpn --config "client.ovpn"
 
 """
 
-_RUNVPNTEXT = """
-	openvpn --config "client.ovpn"
-"""
+
+
 
 _CLIENTCONFIGTEXT = """
 ##############################################

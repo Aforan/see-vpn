@@ -1,6 +1,6 @@
 from keyserv.settings import *
 
-server_address = 'ec2-35-165-123-143.us-west-2.compute.amazonaws.com'
+server_address = 'ec2-35-162-242-30.us-west-2.compute.amazonaws.com'
 max_keys_per_user = 3
 
 crt_dir = os.path.join(USER_PATH, 'keys/')
