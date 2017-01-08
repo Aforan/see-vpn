@@ -255,7 +255,7 @@ def get_config_zip(key):
 	zf.writestr(bat_path, get_bat_file().replace('\n', '\r\n'))
 
 	vpninfo_path = os.path.join(subdir, 'vpninfo.bat')
-	zf.writestr(bat_path, get_vpninfo_file().replace('\n', '\r\n'))
+	zf.writestr(vpninfo_path, get_vpninfo_file().replace('\n', '\r\n'))
 
 	config_path = os.path.join(subdir, 'client.ovpn')
 	zf.writestr(config_path, get_config_file(settings.server_address).replace('\n', '\r\n'))
