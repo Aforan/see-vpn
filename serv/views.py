@@ -110,7 +110,6 @@ def user_request_view(request, _data={}):
 					org_name=form.cleaned_data['organization_name'], 
 					contact_name=form.cleaned_data['contact_name'], 
 					contact_email=form.cleaned_data['contact_email'], 
-					contact_phone=form.cleaned_data['contact_phone'],
 					is_active=False)
 
 				try:
