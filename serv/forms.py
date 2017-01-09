@@ -16,7 +16,6 @@ class UserRequestForm(forms.Form):
 	contact_email = forms.CharField(label="Email", max_length=64, required=True,
 							        widget=forms.EmailInput)
 
-	contact_phone = PhoneNumberField(label="Phone", required=False)
 	username = forms.CharField(label="Username", max_length=64, required=True)
 	
 	password = forms.CharField(label="Password", max_length=64, required=True,
