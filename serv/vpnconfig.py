@@ -269,7 +269,7 @@ def write_doc_files(zf):
 	subdir = "VPNConfig"
 	docdir = "doc"
 	
-	if not os.path.isfile(settings.doc_dir):
+	if not os.path.isdir(settings.doc_dir):
 		return
 	
 	files = [f for f in os.listdir(settings.doc_dir) if os.path.isfile(os.path.join(settings.doc_dir, f))]
