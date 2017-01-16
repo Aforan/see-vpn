@@ -211,6 +211,7 @@ import os
 import io
 import zipfile
 from serv import settings
+from io import BytesIO
 
 def get_readme():
 	return _READMETEXT
@@ -242,6 +243,43 @@ def get_key_file(key):
 
 	return key_str.read()
 
+def write_windows_conf(zf, key):
+	subdir = "VPNConfig"
+	windir = "Windows"
+
+	bat_path = os.path.join(subdir, windir, 'runvpn.bat')
+	zf.writestr(bat_path, get_bat_file().replace('\n', '\r\n'))
+
+	vpninfo_path = os.path.join(subdir, windir, 'vpninfo.bat')
+	zf.writestr(vpninfo_path, get_vpninfo_file().replace('\n', '\r\n'))
+
+	config_path = os.path.join(subdir, windir, 'client.ovpn')
+	zf.writestr(config_path, get_config_file(settings.server_address).replace('\n', '\r\n'))
+
+	ca_path = os.path.join(subdir, windir, 'Keys', 'ca.crt')
+	zf.writestr(ca_path, get_ca_file())
+
+	crt_path = os.path.join(subdir, windir, 'Keys', 'client.crt')
+	zf.writestr(crt_path, get_crt_file(key))
+
+	key_path = os.path.join(subdir, windir, 'Keys', 'client.key')
+	zf.writestr(key_path, get_key_file(key))
+
+def write_doc_files(zf):
+	subdir = "VPNConfig"
+	docdir = "doc"
+	
+	if not os.path.isfile(settings.doc_dir):
+		return
+	
+	files = [f for f in os.listdir(settings.doc_dir) if os.path.isfile(os.path.join(settings.doc_dir, f))]
+
+	for file in files:
+		f = open(os.path.join(settings.doc_dir, file), "rb")
+		fpath = os.path.join(subdir, docdir, file)
+
+		zf.writestr(fpath, f.read())
+
 def get_config_zip(key):
 	subdir = "VPNConfig"
 
@@ -251,23 +289,8 @@ def get_config_zip(key):
 	readme_path = os.path.join(subdir, 'README')
 	zf.writestr(readme_path, get_readme().replace('\n', '\r\n'))
 
-	bat_path = os.path.join(subdir, 'runvpn.bat')
-	zf.writestr(bat_path, get_bat_file().replace('\n', '\r\n'))
-
-	vpninfo_path = os.path.join(subdir, 'vpninfo.bat')
-	zf.writestr(vpninfo_path, get_vpninfo_file().replace('\n', '\r\n'))
-
-	config_path = os.path.join(subdir, 'client.ovpn')
-	zf.writestr(config_path, get_config_file(settings.server_address).replace('\n', '\r\n'))
-
-	ca_path = os.path.join(subdir, 'Keys', 'ca.crt')
-	zf.writestr(ca_path, get_ca_file())
-
-	crt_path = os.path.join(subdir, 'Keys', 'client.crt')
-	zf.writestr(crt_path, get_crt_file(key))
-
-	key_path = os.path.join(subdir, 'Keys', 'client.key')
-	zf.writestr(key_path, get_key_file(key))
+	write_windows_conf(zf, key)
+	write_doc_files(zf)
 
 	zf.close()
 
