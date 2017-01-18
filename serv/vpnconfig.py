@@ -5,11 +5,18 @@ Contact: andrew.foran.vr@gmail.com
 
 Contents:
 	-	README				This File
-	-	runvpn.bat			Bat to run the VPN client
-	-	vpninfo.bat			Bat to return the ip address of your vpn adapter
-	-	client.ovpn			OpenVPN Client configuration file, see Config
+	-	doc					Directory containing documentation, **start there**
+		-	SEE VPN Installation and Configuration
+		-	Pitch SEE VPN Configuration
+		-	MAK SEE VPN Configuration
+	-	Windows				Directory containing Windows specific config and scripts
+		-	runvpn.bat			Bat to run the VPN client
+		-	vpninfo.bat			Bat to return the ip address of your vpn adapter
+		-	client.ovpn			OpenVPN Client configuration file, see Config
+	-	OSX					Directory containing Mac OS X specific config
+		-	client.ovpn			OpenVPN Client configuration file, see Config
 
-	-	Keys
+	-	Keys (In both Windows and OSX directories)
 		-	ca.crt			Certificate Authority Key
 		-	client.crt		Client certificate, Unique to YOU
 		-	client.key		Client key, This should be kept secret, don't give away
@@ -80,7 +87,7 @@ for /f "delims=" %%i in ('netsh interface ip show addresses "%_result%"') do ech
 pause
 """
 
-_CLIENTCONFIGTEXT = """
+_WINCLIENTCONFIGTEXT = """
 ##############################################
 # Sample client-side OpenVPN 2.0 config file #
 # for connecting to multi-client server.     #
@@ -207,6 +214,134 @@ verb 3
 ;mute 20
 """
 
+_OSXCLIENTCONFIGTEXT = """
+##############################################
+# Sample client-side OpenVPN 2.0 config file #
+# for connecting to multi-client server.     #
+#                                            #
+# This configuration can be used by multiple #
+# clients, however each client should have   #
+# its own cert and key files.                #
+#                                            #
+# On Windows, you might want to rename this  #
+# file so it has a .ovpn extension           #
+##############################################
+
+# Specify that we are a client and that we
+# will be pulling certain config file directives
+# from the server.
+client
+
+# Use the same setting as you are using on
+# the server.
+# On most systems, the VPN will not function
+# unless you partially or fully disable
+# the firewall for the TUN/TAP interface.
+;dev tap
+dev tun
+
+# Windows needs the TAP-Windows adapter name
+# from the Network Connections panel
+# if you have more than one.  On XP SP2,
+# you may need to disable the firewall
+# for the TAP adapter.
+;dev-node "Ethernet 2"
+
+# Are we connecting to a TCP or
+# UDP server?  Use the same setting as
+# on the server.
+proto tcp
+;proto udp
+
+# The hostname/IP and port of the server.
+# You can have multiple remote entries
+# to load balance between the servers.
+remote {remote_address}
+port 443
+;remote my-server-2 1194
+
+# Choose a random host from the remote
+# list for load-balancing.  Otherwise
+# try hosts in the order specified.
+;remote-random
+
+# Keep trying indefinitely to resolve the
+# host name of the OpenVPN server.  Very useful
+# on machines which are not permanently connected
+# to the internet such as laptops.
+resolv-retry infinite
+
+# Most clients don't need to bind to
+# a specific local port number.
+nobind
+
+# Downgrade privileges after initialization (non-Windows only)
+;user nobody
+;group nobody
+
+# Try to preserve some state across restarts.
+persist-key
+persist-tun
+
+# If you are connecting through an
+# HTTP proxy to reach the actual OpenVPN
+# server, put the proxy server/IP and
+# port number here.  See the man page
+# if your proxy server requires
+# authentication.
+;http-proxy-retry # retry on connection failures
+;http-proxy [proxy server] [proxy port #]
+
+# Wireless networks often produce a lot
+# of duplicate packets.  Set this flag
+# to silence duplicate packet warnings.
+;mute-replay-warnings
+
+# SSL/TLS parms.
+# See the server config file for more
+# description.  It's best to use
+# a separate .crt/.key file pair
+# for each client.  A single ca
+# file can be used for all clients.
+ca "Keys//ca.crt"
+cert "Keys//client.crt"
+key "Keys//client.key"
+
+# Verify server certificate by checking
+# that the certicate has the nsCertType
+# field set to "server".  This is an
+# important precaution to protect against
+# a potential attack discussed here:
+#  http://openvpn.net/howto.html#mitm
+#
+# To use this feature, you will need to generate
+# your server certificates with the nsCertType
+# field set to "server".  The build-key-server
+# script in the easy-rsa folder will do this.
+;ns-cert-type server
+
+# If a tls-auth key is used on the server
+# then every client must also have the key.
+;tls-auth ta.key 1
+
+# Select a cryptographic cipher.
+# If the cipher option is used on the server
+# then you must also specify it here.
+;cipher x
+
+# Enable compression on the VPN link.
+# Don't enable this unless it is also
+# enabled in the server config file.
+comp-lzo
+
+# Set log file verbosity.
+verb 3
+
+# Silence repeating messages
+;mute 20
+"""
+
+
 import os
 import io
 import zipfile
@@ -222,8 +357,9 @@ def get_bat_file():
 def get_vpninfo_file():
 	return _VPNINFOBAT
 
-def get_config_file(remote_address):
-	return _CLIENTCONFIGTEXT.format(remote_address=remote_address)
+def get_config_file(remote_address, ismac=False):
+	txt = _OSXCLIENTCONFIGTEXT if ismac else _WINCLIENTCONFIGTEXT
+	return txt.format(remote_address=remote_address)
 
 def get_ca_file():
 	with open(settings.ca_path, 'r') as f:
@@ -265,6 +401,22 @@ def write_windows_conf(zf, key):
 	key_path = os.path.join(subdir, windir, 'Keys', 'client.key')
 	zf.writestr(key_path, get_key_file(key))
 
+def write_osx_conf(zf, key):
+	subdir = "VPNConfig"
+	windir = "OSX"
+
+	config_path = os.path.join(subdir, windir, 'client.ovpn')
+	zf.writestr(config_path, get_config_file(settings.server_address, ismac=True).replace('\n', '\r\n'))
+
+	ca_path = os.path.join(subdir, windir, 'Keys', 'ca.crt')
+	zf.writestr(ca_path, get_ca_file())
+
+	crt_path = os.path.join(subdir, windir, 'Keys', 'client.crt')
+	zf.writestr(crt_path, get_crt_file(key))
+
+	key_path = os.path.join(subdir, windir, 'Keys', 'client.key')
+	zf.writestr(key_path, get_key_file(key))
+
 def write_doc_files(zf):
 	subdir = "VPNConfig"
 	docdir = "doc"
@@ -290,6 +442,7 @@ def get_config_zip(key):
 	zf.writestr(readme_path, get_readme().replace('\n', '\r\n'))
 
 	write_windows_conf(zf, key)
+	write_osx_conf(zf, key)
 	write_doc_files(zf)
 
 	zf.close()
