@@ -379,15 +379,16 @@ def get_key_file(key):
 
 	return key_str.read()
 
-def write_windows_conf(zf, key):
+def write_windows_conf(zf, key, nobatch=False):
 	subdir = "VPNConfig"
 	windir = "Windows"
 
-	bat_path = os.path.join(subdir, windir, 'runvpn.bat')
-	zf.writestr(bat_path, get_bat_file().replace('\n', '\r\n'))
+	if not nobatch:
+		bat_path = os.path.join(subdir, windir, 'runvpn.bat')
+		zf.writestr(bat_path, get_bat_file().replace('\n', '\r\n'))
 
-	vpninfo_path = os.path.join(subdir, windir, 'vpninfo.bat')
-	zf.writestr(vpninfo_path, get_vpninfo_file().replace('\n', '\r\n'))
+		vpninfo_path = os.path.join(subdir, windir, 'vpninfo.bat')
+		zf.writestr(vpninfo_path, get_vpninfo_file().replace('\n', '\r\n'))
 
 	config_path = os.path.join(subdir, windir, 'client.ovpn')
 	zf.writestr(config_path, get_config_file(settings.server_address).replace('\n', '\r\n'))
@@ -432,7 +433,7 @@ def write_doc_files(zf):
 
 		zf.writestr(fpath, f.read())
 
-def get_config_zip(key):
+def get_config_zip(key, nobatch=False):
 	subdir = "VPNConfig"
 
 	out = io.BytesIO()
@@ -441,7 +442,7 @@ def get_config_zip(key):
 	readme_path = os.path.join(subdir, 'README')
 	zf.writestr(readme_path, get_readme().replace('\n', '\r\n'))
 
-	write_windows_conf(zf, key)
+	write_windows_conf(zf, key, nobatch=nobatch)
 	write_osx_conf(zf, key)
 	write_doc_files(zf)
 

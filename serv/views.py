@@ -61,6 +61,30 @@ def key_list_view(request, _data={}):
 	return render(request, 'key_list.html', data)
 
 @login_required(login_url='/login/')
+def nobatdownload_config_view(request, key_name=None):
+		if key_name == None:
+			raise Exception('Must provide a key name to download a key')
+
+		key = service.get_key(key_name)
+		if key == None:
+			raise Exception('Invalid key name provided')
+
+		if key.userdetailsmodel is None or key.userdetailsmodel.user is None:
+			raise Exception('Cannot get config file, no key is assigned to this client')
+		
+		user = key.userdetailsmodel.user
+		
+		if user != request.user and not request.user.has_perm('serv.admin_users'):
+			raise Exception('Cannot get config file, invalid user')
+
+		zip_file = vpnconfig.get_config_zip(key, nobatch=True)
+
+		resp = HttpResponse(zip_file.getvalue(), content_type="application/x-zip-compressed")
+		resp['Content-Disposition'] = 'attachment; filename={}'.format('VPNConfig.zip')
+
+		return resp
+
+@login_required(login_url='/login/')
 def download_config_view(request, key_name=None):
 	if request.method == 'GET':	
 		if key_name == None:

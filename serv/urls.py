@@ -10,4 +10,5 @@ urlpatterns = [
     url(r'^user_request/$', views.user_request_view),
 	url(r'^user_request_success/$', views.user_request_success_view),
     url(r'^download_config/(?P<key_name>\S+)$', views.download_config_view),
+    url(r'^nobat_download_config/(?P<key_name>\S+)$', views.nobatdownload_config_view),
 ]

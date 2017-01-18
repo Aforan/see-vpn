@@ -9,6 +9,7 @@
 	<h2>Download OpenVPN Config</h2>
 	{% if key %}
 	<div><p>{{ key.name|download_link }}</p></div>
+	<div><p>If you are having firewall related download issues, try this link: {{ key.name|nobatch_download_link }}</p></div>
 	{% else %}
 	<p>This account is inactive, contact the administrator for activation</p>
 	{% endif %}

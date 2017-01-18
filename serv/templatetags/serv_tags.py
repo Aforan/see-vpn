@@ -12,6 +12,13 @@ def download_link(keyname):
 	return mark_safe("<a href='{}'>Download</a>".format(url))
 
 @register.filter
+def nobatch_download_link(keyname):
+	url = "/nobat_download_config/{}".format(keyname)
+	url = escape_uri_path(url)
+
+	return mark_safe("<a href='{}'>Download</a>".format(url))
+
+@register.filter
 def unassign_link(key, redirect=None):
 	url = "/unassign_key/{}".format(key.name)
 	url = (url if redirect == None 
